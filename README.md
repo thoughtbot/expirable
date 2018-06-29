@@ -5,7 +5,7 @@ Manage values that expire after a period of time.
 ## Example
 
 ```elm
-import Expirable exposing (Expirable, SecondsRemaining(..))
+import Expirable exposing (Expirable)
 
 
 type alias Model =
@@ -20,8 +20,8 @@ type Msg
 initial : Model
 initial =
     { toastMessages =
-        [ Expirable.build (SecondsRemaining 5) "Hi there"
-        , Expirable.build (SecondsRemaining 30) "This goes longer"
+        [ Expirable.build (Expirable.seconds 5) "Hi there"
+        , Expirable.build (Expirable.seconds 30) "This goes longer"
         ]
     }
 
