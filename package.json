@@ -1,0 +1,15 @@
+{
+  "name": "expirable",
+  "version": "1.0.0",
+  "description": "Elm package to manage values that expire after a period of time",
+  "repository": "git@github.com:thoughtbot/expirable.git",
+  "author": "Josh Clayton <jclayton@thoughtbot.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "./node_modules/.bin/elm make src/Expirable.elm --output /dev/null"
+  },
+  "devDependencies": {
+    "elm": "0.18",
+    "elm-format": "^0.7.0-exp"
+  }
+}

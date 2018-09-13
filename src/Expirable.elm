@@ -1,10 +1,10 @@
 module Expirable
     exposing
         ( Expirable
-        , seconds
         , build
-        , subscription
         , percentComplete
+        , seconds
+        , subscription
         , tickAll
         , value
         )
@@ -167,10 +167,10 @@ tick time (Expirable a seconds secondsTotal lastTicked) =
                     Just oldTime ->
                         round <| (time - oldTime) / 1000
     in
-        if anySecondsRemaining newSecondsRemaining then
-            Just <| Expirable a newSecondsRemaining secondsTotal (Just time)
-        else
-            Nothing
+    if anySecondsRemaining newSecondsRemaining then
+        Just <| Expirable a newSecondsRemaining secondsTotal (Just time)
+    else
+        Nothing
 
 
 catMaybes : List (Maybe a) -> List a

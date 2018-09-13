@@ -41,6 +41,24 @@ update msg model =
                 ! []
 ```
 
+## Development
+
+To set up a working development environment, run:
+
+```sh
+yarn
+```
+
+Ensure that this project's `node_modules/.bin` is at the beginning
+of your `$PATH`, ensuring that any local NPM packages have the
+highest priority.
+
+To ensure the package compiles:
+
+```sh
+yarn build
+```
+
 ## License
 
 See the [LICENSE](/LICENSE) file.
