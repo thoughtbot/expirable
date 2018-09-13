@@ -59,6 +59,12 @@ To ensure the package compiles:
 yarn build
 ```
 
+To run tests:
+
+```sh
+yarn test
+```
+
 ## License
 
 See the [LICENSE](/LICENSE) file.

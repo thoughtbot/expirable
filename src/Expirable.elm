@@ -194,7 +194,10 @@ this would return `0.25`.
 -}
 percentComplete : Expirable a -> Float
 percentComplete (Expirable _ (SecondsRemaining remaining) (SecondsTotal total) _) =
-    remaining / total
+    if remaining == total then
+        0
+    else
+        1 - remaining / total
 
 
 {-| Construct a value representing the number of seconds before a value expires.
