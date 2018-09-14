@@ -14,7 +14,7 @@ type alias Model =
 
 
 type Msg
-    = DecrementToastMessages Time.Time
+    = DecrementToastMessages Time.Posix
 
 
 initial : Model
@@ -35,10 +35,11 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         DecrementToastMessages time ->
-            { model
+            ( { model
                 | toastMessages = Expirable.tickAll time model.toastMessages
-            }
-                ! []
+              }
+            , Cmd.none
+            )
 ```
 
 ## Development

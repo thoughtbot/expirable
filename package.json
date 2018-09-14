@@ -6,12 +6,12 @@
   "author": "Josh Clayton <jclayton@thoughtbot.com>",
   "license": "MIT",
   "scripts": {
-    "build": "./node_modules/.bin/elm make src/Expirable.elm --output /dev/null",
-    "test": "./node_modules/.bin/elm-test"
+    "build": "./node_modules/.bin/elm make",
+    "test": "./node_modules/.bin/elm-test --compiler ./node_modules/.bin/elm"
   },
   "devDependencies": {
-    "elm": "0.18",
-    "elm-format": "^0.7.0-exp",
-    "elm-test": "0.18.12"
+    "elm": "0.19",
+    "elm-format": "^0.8.0",
+    "elm-test": "^0.19.0-beta8"
   }
 }

@@ -11,7 +11,7 @@ jobs:
       - run: source $BASH_ENV
       - restore_cache:
           keys:
-          - dependencies-{{ .Environment.CACHE_VERSION }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          - dependencies-{{ .Environment.CACHE_VERSION }}-{{ checksum "package.json" }}-{{ checksum "elm.json" }}
           # fallback to using the latest cache if no exact match is found
           - dependencies-{{ .Environment.CACHE_VERSION }}
       - run: | # epic build time improvement - see https://github.com/elm-lang/elm-compiler/issues/1473#issuecomment-245704142
@@ -24,16 +24,17 @@ jobs:
             cd ..;
           fi
       - run: yarn install
-      - run: elm package install -y
+      - run: elm make
       - save_cache:
           paths:
             - node_modules
             - elm-stuff
             - tests/elm-stuff
             - sysconfcpus
-          key: dependencies-{{ .Environment.CACHE_VERSION }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
-      - run: mv $HOME/repo/node_modules/.bin/elm-make $HOME/repo/node_modules/.bin/elm-make-old
-      - run: printf '%s\n\n' '#!/bin/bash' 'echo "Running elm-make with sysconfcpus -n 2"' '$HOME/repo/sysconfcpus/bin/sysconfcpus -n 2 elm-make-old "$@"' > $HOME/repo/node_modules/.bin/elm-make
-      - run: chmod +x $HOME/repo/node_modules/.bin/elm-make
+            - $HOME/.elm
+          key: dependencies-{{ .Environment.CACHE_VERSION }}-{{ checksum "package.json" }}-{{ checksum "elm.json" }}
+      - run: mv $HOME/repo/node_modules/.bin/elm $HOME/repo/node_modules/.bin/elm-old
+      - run: printf '%s\n\n' '#!/bin/bash' 'echo "Running elm with sysconfcpus -n 2"' '$HOME/repo/sysconfcpus/bin/sysconfcpus -n 2 elm-old "$@"' > $HOME/repo/node_modules/.bin/elm
+      - run: chmod +x $HOME/repo/node_modules/.bin/elm
       - run: yarn test
       - run: elm-format --validate src

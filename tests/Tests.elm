@@ -16,10 +16,10 @@ suite =
                     (Expirable.percentComplete <| expiresInNSeconds expiresInSeconds)
                     0
         , fuzz positiveInt "handles tickAll independent of time start" <|
-            \startTime ->
+            \start ->
                 let
                     startSeconds =
-                        seconds startTime
+                        seconds start
                 in
                 Expect.equal
                     ([ expiresInNSeconds 2 ]
@@ -28,10 +28,10 @@ suite =
                     )
                     [ 0.5 ]
         , fuzz positiveInt "removes expirables that run out of time with tickAll" <|
-            \startTime ->
+            \start ->
                 let
                     startSeconds =
-                        seconds startTime
+                        seconds start
 
                     secondTickSeconds =
                         addSeconds startSeconds (seconds 1)
@@ -43,10 +43,10 @@ suite =
                     )
                     []
         , fuzz positiveInt "retains the correct expirables with tickAll" <|
-            \startTime ->
+            \start ->
                 let
                     startSeconds =
-                        seconds startTime
+                        seconds start
 
                     secondTickSeconds =
                         addSeconds startSeconds (seconds 14)
@@ -61,7 +61,6 @@ suite =
         , fuzzValueForType "calculates value for String" Fuzz.string
         , fuzzValueForType "calculates value for Bool" Fuzz.bool
         , fuzzValueForType "calculates value for Int" Fuzz.int
-        , fuzzValueForType "calculates value for Float" Fuzz.float
         ]
 
 
@@ -88,17 +87,17 @@ addSeconds (Seconds a) (Seconds b) =
     Seconds <| a + b
 
 
-secondsToTime : Seconds -> Time.Time
+secondsToTime : Seconds -> Time.Posix
 secondsToTime (Seconds s) =
-    toFloat s * 1000
+    Time.millisToPosix <| s * 1000
 
 
 expiresInNSeconds : Int -> Expirable.Expirable String
 expiresInNSeconds i =
-    Expirable.build (Expirable.seconds <| toFloat i) "Welcome to the site!"
+    Expirable.build (Expirable.seconds i) "Welcome to the site!"
 
 
-startTime : Time.Time
+startTime : Time.Posix
 startTime =
     secondsToTime <| seconds 0
 

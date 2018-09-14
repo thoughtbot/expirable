@@ -1,13 +1,8 @@
-module Expirable
-    exposing
-        ( Expirable
-        , build
-        , percentComplete
-        , seconds
-        , subscription
-        , tickAll
-        , value
-        )
+module Expirable exposing
+    ( Expirable, build, seconds
+    , subscription, tickAll
+    , value, percentComplete
+    )
 
 {-| The concept of a value that expires or disappears over a period of time is
 relatively common in applications. The `Expirable a` type allows one to wrap a
@@ -31,7 +26,7 @@ subscriptions, and modeling to manage the list of toast messages.
         }
 
     type Msg
-        = DecrementToastMessages Time.Time
+        = DecrementToastMessages Time.Posix
 
     initial : Model
     initial =
@@ -49,10 +44,11 @@ subscriptions, and modeling to manage the list of toast messages.
     update msg model =
         case msg of
             DecrementToastMessages time ->
-                { model
+                ( { model
                     | toastMessages = Expirable.tickAll time model.toastMessages
-                }
-                    ! []
+                  }
+                , Cmd.none
+                )
 
 
 # Type and Constructors
@@ -75,15 +71,15 @@ import Time
 
 
 type SecondsRemaining
-    = SecondsRemaining Time.Time
+    = SecondsRemaining Int
 
 
 type SecondsTotal
-    = SecondsTotal Time.Time
+    = SecondsTotal Int
 
 
 type alias LastTicked =
-    Maybe Time.Time
+    Maybe Time.Posix
 
 
 {-| The core `Expirable` type describing a value that can expire in the future.
@@ -103,8 +99,8 @@ duration (in seconds) that the value should remain and the value itself.
 
 -}
 build : SecondsRemaining -> a -> Expirable a
-build (SecondsRemaining total) value =
-    Expirable value (SecondsRemaining total) (SecondsTotal total) Nothing
+build (SecondsRemaining total) a =
+    Expirable a (SecondsRemaining total) (SecondsTotal total) Nothing
 
 
 {-| Generate a subscription to tag an application-specific `Msg`; this is used
@@ -115,9 +111,9 @@ in conjunction with `tickAll` to manage a list of `Expirable a`.
             Expirable.subscription DecrementToastMessages
 
 -}
-subscription : (Time.Time -> a) -> Sub a
+subscription : (Time.Posix -> a) -> Sub a
 subscription =
-    Time.every Time.second
+    Time.every oneSecondInMillis
 
 
 anySecondsRemaining : SecondsRemaining -> Bool
@@ -129,7 +125,7 @@ anySecondsRemaining (SecondsRemaining i) =
 manage a list of `Expirable a` in order to expire the appropriate set of values.
 
         type Msg
-            = DecrementToastMessages Time.Time
+            = DecrementToastMessages Time.Posix
 
 
         update : Msg -> Model -> ( Model, Cmd Msg )
@@ -142,33 +138,33 @@ manage a list of `Expirable a` in order to expire the appropriate set of values.
                         ! []
 
 -}
-tickAll : Time.Time -> List (Expirable a) -> List (Expirable a)
+tickAll : Time.Posix -> List (Expirable a) -> List (Expirable a)
 tickAll time =
     catMaybes << List.map (tick time)
 
 
-decreaseSecondsRemaining : Float -> SecondsRemaining -> SecondsRemaining
+decreaseSecondsRemaining : Int -> SecondsRemaining -> SecondsRemaining
 decreaseSecondsRemaining i (SecondsRemaining remaining) =
     SecondsRemaining <| remaining - i
 
 
-tick : Time.Time -> Expirable a -> Maybe (Expirable a)
-tick time (Expirable a seconds secondsTotal lastTicked) =
+tick : Time.Posix -> Expirable a -> Maybe (Expirable a)
+tick time (Expirable a secs secondsTotal lastTicked) =
     let
         newSecondsRemaining =
-            decreaseSecondsRemaining secondToDecrease seconds
+            decreaseSecondsRemaining secondToDecrease secs
 
         secondToDecrease =
-            toFloat <|
-                case lastTicked of
-                    Nothing ->
-                        1
+            case lastTicked of
+                Nothing ->
+                    1
 
-                    Just oldTime ->
-                        round <| (time - oldTime) / 1000
+                Just oldTime ->
+                    round <| toFloat (Time.posixToMillis time - Time.posixToMillis oldTime) / oneSecondInMillis
     in
     if anySecondsRemaining newSecondsRemaining then
         Just <| Expirable a newSecondsRemaining secondsTotal (Just time)
+
     else
         Nothing
 
@@ -196,12 +192,18 @@ percentComplete : Expirable a -> Float
 percentComplete (Expirable _ (SecondsRemaining remaining) (SecondsTotal total) _) =
     if remaining == total then
         0
+
     else
-        1 - remaining / total
+        1 - toFloat remaining / toFloat total
 
 
 {-| Construct a value representing the number of seconds before a value expires.
 -}
-seconds : Time.Time -> SecondsRemaining
+seconds : Int -> SecondsRemaining
 seconds =
     SecondsRemaining
+
+
+oneSecondInMillis : Float
+oneSecondInMillis =
+    1000
