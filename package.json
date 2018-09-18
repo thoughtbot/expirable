@@ -1,6 +1,6 @@
 {
   "name": "expirable",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Elm package to manage values that expire after a period of time",
   "repository": "git@github.com:thoughtbot/expirable.git",
   "author": "Josh Clayton <jclayton@thoughtbot.com>",

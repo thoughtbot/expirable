@@ -3,7 +3,7 @@
     "name": "thoughtbot/expirable",
     "summary": "Manage values that expire after a period of time",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "exposed-modules": [
         "Expirable"
     ],
