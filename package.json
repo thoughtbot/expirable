@@ -7,7 +7,8 @@
   "license": "MIT",
   "scripts": {
     "build": "./node_modules/.bin/elm make",
-    "test": "./node_modules/.bin/elm-test --compiler ./node_modules/.bin/elm"
+    "test": "./node_modules/.bin/elm-test --compiler ./node_modules/.bin/elm",
+    "test-watch": "./node_modules/.bin/elm-test --compiler ./node_modules/.bin/elm --watch"
   },
   "devDependencies": {
     "elm": "0.19",

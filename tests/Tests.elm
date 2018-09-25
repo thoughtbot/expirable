@@ -2,6 +2,7 @@ module Tests exposing (suite)
 
 import Expect exposing (Expectation)
 import Expirable
+import Expirable.Seconds as Seconds
 import Fuzz
 import Test exposing (..)
 import Time
@@ -19,11 +20,11 @@ suite =
             \start ->
                 let
                     startSeconds =
-                        seconds start
+                        Seconds.seconds start
                 in
                 Expect.equal
                     ([ expiresInNSeconds 2 ]
-                        |> Expirable.tickAll (secondsToTime startSeconds)
+                        |> Expirable.tickAll (Seconds.toPosix startSeconds)
                         |> List.map Expirable.percentComplete
                     )
                     [ 0.5 ]
@@ -31,30 +32,30 @@ suite =
             \start ->
                 let
                     startSeconds =
-                        seconds start
+                        Seconds.seconds start
 
                     secondTickSeconds =
-                        addSeconds startSeconds (seconds 1)
+                        Seconds.add startSeconds (Seconds.seconds 1)
                 in
                 Expect.equal
                     ([ expiresInNSeconds 2 ]
-                        |> Expirable.tickAll (secondsToTime startSeconds)
-                        |> Expirable.tickAll (secondsToTime secondTickSeconds)
+                        |> Expirable.tickAll (Seconds.toPosix startSeconds)
+                        |> Expirable.tickAll (Seconds.toPosix secondTickSeconds)
                     )
                     []
         , fuzz positiveInt "retains the correct expirables with tickAll" <|
             \start ->
                 let
                     startSeconds =
-                        seconds start
+                        Seconds.seconds start
 
                     secondTickSeconds =
-                        addSeconds startSeconds (seconds 14)
+                        Seconds.add startSeconds (Seconds.seconds 14)
                 in
                 Expect.equal
                     ([ expiresInNSeconds 10, expiresInNSeconds 30, expiresInNSeconds 60 ]
-                        |> Expirable.tickAll (secondsToTime startSeconds)
-                        |> Expirable.tickAll (secondsToTime secondTickSeconds)
+                        |> Expirable.tickAll (Seconds.toPosix startSeconds)
+                        |> Expirable.tickAll (Seconds.toPosix secondTickSeconds)
                         |> List.map Expirable.percentComplete
                     )
                     [ 0.5, 0.25 ]
@@ -73,25 +74,6 @@ fuzzValueForType message typeFuzzer =
                 currentValue
 
 
-type Seconds
-    = Seconds Int
-
-
-seconds : Int -> Seconds
-seconds =
-    Seconds
-
-
-addSeconds : Seconds -> Seconds -> Seconds
-addSeconds (Seconds a) (Seconds b) =
-    Seconds <| a + b
-
-
-secondsToTime : Seconds -> Time.Posix
-secondsToTime (Seconds s) =
-    Time.millisToPosix <| s * 1000
-
-
 expiresInNSeconds : Int -> Expirable.Expirable String
 expiresInNSeconds i =
     Expirable.build (Expirable.seconds i) "Welcome to the site!"
@@ -99,7 +81,7 @@ expiresInNSeconds i =
 
 startTime : Time.Posix
 startTime =
-    secondsToTime <| seconds 0
+    Seconds.toPosix <| Seconds.seconds 0
 
 
 positiveInt : Fuzz.Fuzzer Int
